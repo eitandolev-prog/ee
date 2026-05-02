@@ -1,262 +1,121 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="style.css">
-<script src="script.js"></script>
-<h1/>Tip: Click on the bear twice and see what happens🤫</h1>
-<html lang="he" dir="rtl">
-<head/><link rel="stylesheet" href="style.css"></head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Super Bear Island</title>
-    <style>
-        :root { --gold: #f1c40f; --orange: #e67e22; --dark: #1a1a2e; }
-        body { margin: 0; overflow: hidden; background: var(--dark); font-family: 'Arial Black', sans-serif; touch-action: none; color: white; text-align: center; }
-        
-        #lobby-screen { position: fixed; inset: 0; background: radial-gradient(circle, #1a1a2e, #000); display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding: 40px 0; z-index: 500; }
-        .character-display { font-size: 100px; filter: drop-shadow(0 0 20px #3498db); animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-
-        .stat-badge { background: rgba(0,0,0,0.8); padding: 10px 25px; border-radius: 30px; border: 2px solid var(--gold); font-size: 22px; margin: 5px; }
-        .btn { padding: 15px 40px; font-size: 24px; border-radius: 15px; border: none; cursor: pointer; font-weight: bold; background: #27ae60; color: white; box-shadow: 0 5px 0 #1e8449; }
-        
-        #shop-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; color: #333; padding: 30px; border-radius: 20px; display: none; z-index: 1000; width: 300px; border: 5px solid var(--orange); }
-
-        canvas { display: none; cursor: crosshair; background: #27ae60; }
-        #game-ui { position: absolute; top: 20px; width: 100%; display: none; flex-direction: column; align-items: center; pointer-events: none; }
-        #wave-info { color: #ff4757; font-size: 24px; font-weight: bold; margin-top: 5px; }
-    </style>
-<head/>
-  <script src="script.js"></script>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Super Bear Island</title>
+<style>
+:root{--gold:#f1c40f;--orange:#e67e22;--dark:#1a1a2e}
+body{margin:0;overflow:hidden;background:var(--dark);font-family:Arial Black,Arial,sans-serif;touch-action:none;color:white;text-align:center}
+canvas{display:none;background:#27ae60;cursor:crosshair}
+#lobby-screen{position:fixed;inset:0;background:radial-gradient(circle,#1a1a2e,#000);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;z-index:500}
+.stat-badge{background:rgba(0,0,0,.8);padding:10px 20px;border-radius:30px;border:2px solid var(--gold);font-size:20px;margin:5px}
+.btn{padding:15px 35px;font-size:22px;border-radius:15px;border:none;cursor:pointer;font-weight:bold;background:#27ae60;color:white}
+#shop-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;color:#333;padding:25px;border-radius:20px;display:none;z-index:1000;width:300px;border:5px solid var(--orange)}
+#game-ui{position:fixed;top:10px;width:100%;display:none;flex-wrap:wrap;justify-content:center;z-index:20;pointer-events:none}
+#attackBtn{display:none;position:fixed;right:25px;bottom:35px;z-index:999;padding:18px;border-radius:15px;background:#ff4757;color:white;font-weight:bold;border:none}
+</style>
+</head>
 <body>
 
 <div id="lobby-screen">
-    <div style="display:flex">
-        <div class="stat-badge">💰 $<span id="lobby-money">0</span></div>
-        <div class="stat-badge">⚡ Speed: <span id="lobby-speed">4.0</span></div>
-    </div>
+  <h1 style="color:var(--gold)">SUPER BEAR ISLAND</h1>
+  <h2>Tip: Double click the bear to unlock bazooka</h2>
 
-    <div id="name-box">
-        <h1 style="color:var(--gold)">SUPER BEAR ISLAND </h1>
-      <h3/>Tip: Click on the bear twice and see what happens🤫</h3>
-        <input type="text" id="username-input" placeholder="Enter player name..." style="padding:12px; border-radius:8px; border:none; text-align:center; font-size:18px;">
-        <br><br>
-        <button class="btn" onclick="confirmName()">👍👍👍👍👍</button>
-    </div>
+  <div>
+    <span class="stat-badge">💰 $<span id="lobby-money">0</span></span>
+    <span class="stat-badge">⚡ Speed: <span id="lobby-speed">4.0</span></span>
+    <span class="stat-badge">🔥 Level: <span id="lobby-level">1</span></span>
+    <span class="stat-badge">🏆 Best: <span id="best-time">---</span></span>
+  </div>
 
-    <div id="lobby-main" style="display:none">
-        <h2 id="player-name-display" style="color:var(--gold); font-size: 32px;"></h2>
-        <div class="character-display" id="lobby-char">👦</div>
-        <div style="margin-top:20px; display: flex; gap: 10px;">
-            <button class="btn" style="background:var(--orange); box-shadow:0 5px 0 #d35400" onclick="toggleShop()">🛒 Shop</button>
-            <button class="btn" onclick="startMatch()">PLAY</button>
-        </div>
-    </div>
+  <div id="name-box">
+    <input id="username-input" placeholder="Enter player name..." style="padding:12px;border-radius:8px;border:none;text-align:center;font-size:18px">
+    <br><br>
+    <button class="btn" onclick="confirmName()">START</button>
+  </div>
+
+  <div id="lobby-main" style="display:none">
+    <h2 id="player-name-display"></h2>
+    <div id="lobby-char" style="font-size:90px">👦</div>
+    <button class="btn" onclick="toggleShop()" style="background:var(--orange)">🛒 Shop</button>
+    <button class="btn" onclick="startMatch()">PLAY</button>
+  </div>
 </div>
 
 <div id="shop-modal">
-    <h3>Warrior Upgrades</h3>
-    <p>Speed upgrade: <b>$150</b></p>
-    <button onclick="buyUpgrade()" style="padding:10px; cursor:pointer; background:var(--orange); color:white; border:none; border-radius:5px; width:100%;">Buy Upgrade</button>
-    <br><br>
-    <button onclick="toggleShop()" style="color:gray; border:none; background:none; cursor:pointer;">Close</button>
+  <h3>Warrior Upgrades</h3>
+  <p>Speed upgrade: <b>$150</b></p>
+  <button onclick="buyUpgrade()" style="padding:10px;background:var(--orange);color:white;border:none;border-radius:5px;width:100%">Buy Upgrade</button>
+  <br><br>
+  <button onclick="toggleShop()">Close</button>
 </div>
 
 <div id="game-ui">
-    <div class="stat-badge">💰 $<span id="ingame-money">0</span></div>
-    <div id="wave-info" style="display:none">Enemies left: <span id="enemies-left">0</span></div>
+  <div class="stat-badge">💰 $<span id="ingame-money">0</span></div>
+  <div class="stat-badge">❤️ HP: <span id="hp-ui">100</span></div>
+  <div class="stat-badge">⏱ <span id="timer-ui">0.0</span>s</div>
+  <div class="stat-badge">Enemies: <span id="enemies-left">0</span></div>
 </div>
 
+<button id="attackBtn" onclick="normalAttack()">ATTACK</button>
 <canvas id="gameCanvas"></canvas>
 
 <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    const bazookaImg = new Image();
-    bazookaImg.src = 'https://cdn-icons-png.flaticon.com/512/822/822143.png';
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
-    let playerProfile = { name: "", money: 0, speed: 4.0, char: "👦", hasBazooka: false, bearClicks: 0 };
-    let gameActive = false;
-    let match = { px: 0, py: 0, bx: 100, by: 100, coins: [], missiles: [], enemies: [], isArmyPhase: false, totalEnemiesToSpawn: 20, spawnedCount: 0 };
-    let keys = {};
-    let animationId, armyInterval;
+let level = 1;
+let playerHP = 100;
+let boss = null;
+let startTime = 0;
+let currentTime = 0;
+let bestTime = localStorage.getItem("bestTime") || null;
+let lastClickTime = 0;
 
-    function confirmName() {
-        const nameInput = document.getElementById('username-input').value;
-        if(!nameInput) return;
-        playerProfile.name = nameInput;
-        if(nameInput === "admin1114") { playerProfile.money = 9999; playerProfile.speed = 1.0; playerProfile.char = "🦸‍♂️"; }
-        document.getElementById('name-box').style.display = 'none';
-        document.getElementById('lobby-main').style.display = 'block';
-        document.getElementById('player-name-display').innerText = playerProfile.name;
-        document.getElementById('lobby-char').innerText = playerProfile.char;
-        updateUI();
-    }
+let playerProfile = {
+  name:"",
+  money:0,
+  speed:4.0,
+  char:"👦",
+  hasBazooka:false,
+  bearClicks:0
+};
 
-    function updateUI() {
-        document.getElementById('lobby-money').innerText = playerProfile.money;
-        document.getElementById('lobby-speed').innerText = playerProfile.speed.toFixed(1);
-    }
+let gameActive = false;
+let match = {
+  px:0, py:0,
+  bx:100, by:100,
+  coins:[],
+  missiles:[],
+  enemies:[],
+  isArmyPhase:false,
+  totalEnemiesToSpawn:20,
+  spawnedCount:0
+};
 
-    function toggleShop() {
-        const m = document.getElementById('shop-modal');
-        m.style.display = m.style.display === 'block' ? 'none' : 'block';
-    }
+let keys = {};
+let animationId;
+let armyInterval;
 
-    function buyUpgrade() {
-        if(playerProfile.money >= 150) {
-            playerProfile.money -= 150; playerProfile.speed += 0.5; updateUI();
-        } else { alert("You don't have enough money!"); }
-    }
+function confirmName(){
+  const nameInput = document.getElementById("username-input").value;
+  if(!nameInput) return;
 
-    function startMatch() {
-        gameActive = true; 
-        playerProfile.hasBazooka = false; 
-        playerProfile.bearClicks = 0;
-        match.isArmyPhase = false;
-        match.spawnedCount = 0;
-        match.totalEnemiesToSpawn = 20;
-        
-        document.getElementById('lobby-screen').style.display = 'none';
-        document.getElementById('game-ui').style.display = 'flex';
-        document.getElementById('wave-info').style.display = 'none';
-        canvas.style.display = 'block';
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        
-        match.px = canvas.width/2; match.py = canvas.height/2;
-        match.bx = 50; match.by = 50;
-        match.enemies = []; match.missiles = []; match.coins = [];
-        for(let i=0; i<10; i++) spawnCoin();
-        
-        update();
-    }
+  playerProfile.name = nameInput;
 
-    function spawnCoin() { match.coins.push({x: Math.random()*(canvas.width-50)+25, y: Math.random()*(canvas.height-50)+25}); }
-    
-    function spawnSingleEnemy() {
-        if(match.spawnedCount < match.totalEnemiesToSpawn) {
-            match.enemies.push({
-                x: Math.random() > 0.5 ? -50 : canvas.width + 50, 
-                y: Math.random() * canvas.height, 
-                type: Math.random() > 0.5 ? "🐻" : "🧟‍♂️"
-            });
-            match.spawnedCount++;
-            updateEnemiesLeft();
-        }
-    }
+  if(nameInput === "admin1114"){
+    playerProfile.money = 9999;
+    playerProfile.speed = 10.0;
+    playerProfile.char = "🦸‍♂️";
+  }
 
-    function updateEnemiesLeft() {
-        const left = (match.totalEnemiesToSpawn - match.spawnedCount) + match.enemies.length;
-        document.getElementById('enemies-left').innerText = left;
-    }
+  document.getElementById("name-box").style.display = "none";
+  document.getElementById("lobby-main").style.display = "block";
+  document.getElementById("player-name-display").innerText = playerProfile.name;
+  document.getElementById("lobby-char").innerText = playerProfile.char;
+  updateUI();
+}
 
-    function backToLobby(reason) {
-        gameActive = false;
-        clearInterval(armyInterval);
-        cancelAnimationFrame(animationId);
-        if(reason) alert(reason);
-        document.getElementById('lobby-screen').style.display = 'flex';
-        document.getElementById('game-ui').style.display = 'none';
-        canvas.style.display = 'none';
-        updateUI();
-    }
-
-    canvas.addEventListener('mousedown', (e) => {
-        if(!gameActive) return;
-        if(playerProfile.hasBazooka) {
-            let angle = Math.atan2(e.clientY - match.py, e.clientX - match.px);
-            match.missiles.push({x: match.px, y: match.py, vx: Math.cos(angle)*12, vy: Math.sin(angle)*12});
-            return;
-        }
-        if(Math.hypot(e.clientX - match.bx, e.clientY - match.by) < 60) {
-            playerProfile.bearClicks++;
-            if(playerProfile.bearClicks >= 2) { playerProfile.hasBazooka = true; }
-        }
-    });
-
-    window.addEventListener('keydown', e => keys[e.code] = true);
-    window.addEventListener('keyup', e => keys[e.code] = false);
-
-    function update() {
-        if(!gameActive) return;
-
-        if(keys['ArrowUp'] || keys['KeyW']) match.py -= playerProfile.speed;
-        if(keys['ArrowDown'] || keys['KeyS']) match.py += playerProfile.speed;
-        if(keys['ArrowLeft'] || keys['KeyA']) match.px -= playerProfile.speed;
-        if(keys['ArrowRight'] || keys['KeyD']) match.px += playerProfile.speed;
-
-        let ang = Math.atan2(match.py - match.by, match.px - match.bx);
-        match.bx += Math.cos(ang) * 2.5; match.by += Math.sin(ang) * 2.5;
-
-        match.enemies.forEach((en, i) => {
-            let a = Math.atan2(match.py - en.y, match.px - en.x);
-            en.x += Math.cos(a) * 2.2; en.y += Math.sin(a) * 2.2;
-            if(Math.hypot(match.px - en.x, match.py - en.y) < 40) {
-                backToLobby("The zombie army caught you!");
-            }
-        });
-
-        match.missiles.forEach((m, mi) => {
-            m.x += m.vx; m.y += m.vy;
-            if(Math.hypot(m.x - match.bx, m.y - match.by) < 50) {
-                match.bx = -5000; match.missiles.splice(mi, 1);
-                if(!match.isArmyPhase) { 
-                    match.isArmyPhase = true; 
-                    document.getElementById('wave-info').style.display = 'block';
-                    armyInterval = setInterval(spawnSingleEnemy, 1000);
-                }
-            }
-            match.enemies.forEach((en, ei) => {
-                if(Math.hypot(m.x - en.x, m.y - en.y) < 40) {
-                    match.enemies.splice(ei, 1);
-                    playerProfile.money += 30;
-                    document.getElementById('ingame-money').innerText = playerProfile.money;
-                    updateEnemiesLeft();
-                    if(match.spawnedCount >= match.totalEnemiesToSpawn && match.enemies.length === 0) {
-                        level++;
-playerProfile.money += 200;
-playerProfile.speed += 0.5;
-
-if(level >= 2) playerProfile.char = "🦸‍♂️";
-if(level >= 4) playerProfile.char = "🥷";
-if(level >= 6) playerProfile.char = "🧙‍♂️";
-if(level >= 9) playerProfile.char = "👑";
-
-backToLobby("LEVEL UP! You are now level " + level + " 🔥");
-                    }
-                }
-            });
-        });
-
-        match.coins.forEach((c, i) => {
-            if(Math.hypot(match.px-c.x, match.py-c.y) < 35) {
-                match.coins.splice(i, 1); playerProfile.money += 20;
-                document.getElementById('ingame-money').innerText = playerProfile.money;
-                spawnCoin();
-            }
-        });
-
-        if(Math.hypot(match.px - match.bx, match.py - match.by) < 45) {
-            backToLobby("The bear caught you!");
-        }
-
-        draw();
-        animationId = requestAnimationFrame(update);
-    }
-
-    function draw() {
-        ctx.clearRect(0,0,canvas.width, canvas.height);
-        ctx.fillStyle = match.isArmyPhase ? "#2c3e50" : "#27ae60";
-        ctx.fillRect(0,0,canvas.width, canvas.height);
-        match.coins.forEach(c => { ctx.font="30px Arial"; ctx.fillText("💰", c.x-15, c.y+15); });
-        match.enemies.forEach(en => { ctx.font="45px Arial"; ctx.fillText(en.type, en.x-20, en.y+20); });
-        match.missiles.forEach(m => { ctx.font="30px Arial"; ctx.fillText("🔥", m.x-15, m.y+15); });
-        ctx.font = "60px Arial"; ctx.textAlign = "center";
-        ctx.fillText(playerProfile.char, match.px, match.py+15);
-        if(playerProfile.hasBazooka) ctx.drawImage(bazookaImg, match.px + 10, match.py - 35, 65, 65);
-        ctx.fillText("🐻", match.bx, match.by+20);
-    }
-
-
-</script>
-</body>
-</html>
+function updateUI(){
+  document.getElement
