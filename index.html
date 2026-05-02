@@ -4,83 +4,137 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Super Bear Island</title>
-
 <style>
-body{
-  margin:0;
-  overflow:hidden;
-  font-family:Arial;
-  background:#222;
-  color:white;
-  text-align:center;
-}
-
-#lobby{
-  position:fixed;
-  inset:0;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  background:#111;
-}
-
-button{
-  padding:20px;
-  font-size:25px;
-  border:none;
-  border-radius:10px;
-  background:#27ae60;
-  color:white;
-  cursor:pointer;
-}
-
-canvas{
-  display:none;
-  background:#27ae60;
-}
+body{margin:0;overflow:hidden;background:#222;color:white;font-family:Arial;text-align:center}
+#lobby{position:fixed;inset:0;background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+button{padding:18px 35px;font-size:25px;border:0;border-radius:12px;background:#27ae60;color:white;font-weight:bold}
+input{padding:14px;font-size:20px;border-radius:10px;border:0;text-align:center}
+canvas{display:none;background:#67aa5d}
 </style>
 </head>
-
 <body>
 
 <div id="lobby">
   <h1>SUPER BEAR ISLAND</h1>
+  <input id="nameInput" placeholder="Enter name">
+  <h2 id="nameText"></h2>
   <button onclick="startGame()">START</button>
 </div>
 
 <canvas id="game"></canvas>
 
 <script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
 
-let gameActive = false;
+let gameActive=false;
+let keys={};
 
-function startGame(){
-  gameActive = true;
+let player={
+  name:localStorage.getItem("playerName") || "",
+  x:0,y:0,
+  speed:5,
+  emoji:"👦"
+};
 
-  document.getElementById("lobby").style.display = "none";
-  canvas.style.display = "block";
+let wolves=[];
+let bears=[];
 
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  draw();
+if(player.name){
+  document.getElementById("nameInput").style.display="none";
+  document.getElementById("nameText").innerText="Player: "+player.name;
 }
 
-function draw(){
-  if(!gameActive) return;
+function startGame(){
+  if(!player.name){
+    player.name=document.getElementById("nameInput").value.trim() || "Player";
+    localStorage.setItem("playerName",player.name);
+  }
+
+  if(player.name==="Eitan1114"){
+    player.speed=10;
+    player.emoji="🦸‍♂️";
+  }
+
+  document.getElementById("lobby").style.display="none";
+  canvas.style.display="block";
+
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+
+  player.x=canvas.width/2;
+  player.y=canvas.height/2;
+
+  wolves=[];
+  bears=[];
+
+  for(let i=0;i<6;i++){
+    wolves.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,speed:2});
+  }
+
+  for(let i=0;i<2;i++){
+    bears.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,speed:1.3});
+  }
+
+  gameActive=true;
+  gameLoop();
+}
+
+function backToLobby(msg){
+  gameActive=false;
+  if(msg) alert(msg);
+
+  canvas.style.display="none";
+  document.getElementById("lobby").style.display="flex";
+  document.getElementById("nameInput").style.display="none";
+  document.getElementById("nameText").innerText="Player: "+player.name;
+}
+
+window.addEventListener("keydown",e=>keys[e.code]=true);
+window.addEventListener("keyup",e=>keys[e.code]=false);
+
+function moveEnemy(enemy){
+  let a=Math.atan2(player.y-enemy.y,player.x-enemy.x);
+  enemy.x+=Math.cos(a)*enemy.speed;
+  enemy.y+=Math.sin(a)*enemy.speed;
+}
+
+function gameLoop(){
+  if(!gameActive)return;
+
+  if(keys["ArrowUp"]||keys["KeyW"])player.y-=player.speed;
+  if(keys["ArrowDown"]||keys["KeyS"])player.y+=player.speed;
+  if(keys["ArrowLeft"]||keys["KeyA"])player.x-=player.speed;
+  if(keys["ArrowRight"]||keys["KeyD"])player.x+=player.speed;
 
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  ctx.fillStyle = "white";
-  ctx.font = "40px Arial";
-  ctx.fillText("🎮 GAME WORKS!", canvas.width/2 - 120, canvas.height/2);
+  ctx.font="55px Arial";
+  ctx.textAlign="center";
+  ctx.fillText(player.emoji,player.x,player.y);
 
-  requestAnimationFrame(draw);
+  wolves.forEach(w=>{
+    moveEnemy(w);
+    ctx.font="45px Arial";
+    ctx.fillText("🐺",w.x,w.y);
+
+    if(Math.hypot(player.x-w.x,player.y-w.y)<45){
+      backToLobby("Game Over! A wolf caught you!");
+    }
+  });
+
+  bears.forEach(b=>{
+    moveEnemy(b);
+    ctx.font="55px Arial";
+    ctx.fillText("🐻",b.x,b.y);
+
+    if(Math.hypot(player.x-b.x,player.y-b.y)<55){
+      backToLobby("Game Over! A bear caught you!");
+    }
+  });
+
+  requestAnimationFrame(gameLoop);
 }
 </script>
-
 </body>
 </html>
