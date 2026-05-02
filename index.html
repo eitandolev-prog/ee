@@ -4,119 +4,588 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Super Bear Island</title>
+
 <style>
-:root{--gold:#f1c40f;--orange:#e67e22;--dark:#1a1a2e}
-body{margin:0;overflow:hidden;background:var(--dark);font-family:Arial Black,Arial,sans-serif;touch-action:none;color:white;text-align:center}
-canvas{display:none;background:#27ae60;cursor:crosshair}
-#lobby-screen{position:fixed;inset:0;background:radial-gradient(circle,#1a1a2e,#000);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;z-index:500}
-.stat-badge{background:rgba(0,0,0,.8);padding:10px 20px;border-radius:30px;border:2px solid var(--gold);font-size:20px;margin:5px}
-.btn{padding:15px 35px;font-size:22px;border-radius:15px;border:none;cursor:pointer;font-weight:bold;background:#27ae60;color:white}
-#shop-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;color:#333;padding:25px;border-radius:20px;display:none;z-index:1000;width:300px;border:5px solid var(--orange)}
-#game-ui{position:fixed;top:10px;width:100%;display:none;flex-wrap:wrap;justify-content:center;z-index:20;pointer-events:none}
-#attackBtn{display:none;position:fixed;right:25px;bottom:35px;z-index:999;padding:18px;border-radius:15px;background:#ff4757;color:white;font-weight:bold;border:none}
+body{
+  margin:0;
+  overflow:hidden;
+  background:#151526;
+  color:white;
+  font-family:Arial Black, Arial, sans-serif;
+  text-align:center;
+  touch-action:none;
+}
+
+canvas{
+  display:none;
+  background:#27ae60;
+}
+
+#lobby-screen{
+  position:fixed;
+  inset:0;
+  background:radial-gradient(circle,#1b1b35,#05050a);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+  z-index:20;
+}
+
+h1{
+  color:#f1c40f;
+  font-size:46px;
+}
+
+.btn{
+  padding:16px 40px;
+  font-size:26px;
+  border-radius:18px;
+  border:none;
+  font-weight:bold;
+  background:#27ae60;
+  color:white;
+  cursor:pointer;
+  box-shadow:0 7px 0 #1e8449;
+}
+
+input{
+  padding:14px;
+  font-size:20px;
+  border-radius:12px;
+  border:none;
+  text-align:center;
+}
+
+.badge{
+  background:rgba(0,0,0,.75);
+  border:3px solid #f1c40f;
+  padding:10px 20px;
+  border-radius:28px;
+  font-size:22px;
+  margin:5px;
+}
+
+#game-ui{
+  position:fixed;
+  top:10px;
+  left:0;
+  right:0;
+  display:none;
+  justify-content:center;
+  flex-wrap:wrap;
+  z-index:5;
+  pointer-events:none;
+}
+
+#best-bar{
+  position:fixed;
+  top:70px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:6;
+  display:none;
+  pointer-events:none;
+}
+
+#controls{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:10;
+  pointer-events:none;
+}
+
+.ctrl{
+  position:absolute;
+  pointer-events:auto;
+  font-size:22px;
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  font-weight:bold;
+}
+
+#up{left:80px;bottom:140px}
+#down{left:80px;bottom:45px}
+#left{left:25px;bottom:92px}
+#right{left:140px;bottom:92px}
+#attack{right:25px;bottom:80px;background:#ff4757;color:white}
+#fire{right:25px;bottom:155px;background:#ffa502;color:white}
 </style>
 </head>
+
 <body>
 
-  <button class="btn" onclick="confirmName()">START</button>
 <div id="lobby-screen">
-  <h1 style="color:var(--gold)">SUPER BEAR ISLAND</h1>
+  <h1>SUPER BEAR ISLAND</h1>
   <h2>Tip: Double click the bear to unlock bazooka</h2>
 
   <div>
-    <span class="stat-badge">💰 $<span id="lobby-money">0</span></span>
-    <span class="stat-badge">⚡ Speed: <span id="lobby-speed">4.0</span></span>
-    <span class="stat-badge">🔥 Level: <span id="lobby-level">1</span></span>
-    <span class="stat-badge">🏆 Best: <span id="best-time">---</span></span>
+    <span class="badge">💰 $<span id="lobby-money">0</span></span>
+    <span class="badge">⚡ Speed: <span id="lobby-speed">4.0</span></span>
+    <span class="badge">🔥 Level: <span id="lobby-level">1</span></span>
   </div>
 
-  <div id="name-box">
-    <input id="username-input" placeholder="Enter player name..." style="padding:12px;border-radius:8px;border:none;text-align:center;font-size:18px">
-    <br><br>
-    <button class="btn" onclick="confirmName()">START</button>
-  </div>
-
-  <div id="lobby-main" style="display:none">
-    <h2 id="player-name-display"></h2>
-    <div id="lobby-char" style="font-size:90px">👦</div>
-    <button class="btn" onclick="toggleShop()" style="background:var(--orange)">🛒 Shop</button>
-    <button class="btn" onclick="startMatch()">PLAY</button>
-  </div>
-</div>
-
-<div id="shop-modal">
-  <h3>Warrior Upgrades</h3>
-  <p>Speed upgrade: <b>$150</b></p>
-  <button onclick="buyUpgrade()" style="padding:10px;background:var(--orange);color:white;border:none;border-radius:5px;width:100%">Buy Upgrade</button>
-  <br><br>
-  <button onclick="toggleShop()">Close</button>
+  <input id="username-input" placeholder="Enter player name...">
+  <button class="btn" onclick="confirmName()">START</button>
 </div>
 
 <div id="game-ui">
-  <div class="stat-badge">💰 $<span id="ingame-money">0</span></div>
-  <div class="stat-badge">❤️ HP: <span id="hp-ui">100</span></div>
-  <div class="stat-badge">⏱ <span id="timer-ui">0.0</span>s</div>
-  <div class="stat-badge">Enemies: <span id="enemies-left">0</span></div>
+  <div class="badge">💰 $<span id="ingame-money">0</span></div>
+  <div class="badge">❤️ HP: <span id="hp">100</span></div>
+  <div class="badge">⏱ Time: <span id="time">0.0</span>s</div>
+  <div class="badge">🔥 Level: <span id="level">1</span></div>
+  <div class="badge">Enemies: <span id="enemies-left">0</span></div>
 </div>
 
-<button id="attackBtn" onclick="normalAttack()">ATTACK</button>
+<div id="best-bar">
+  <div class="badge">🏆 Best: <span id="best">---</span></div>
+</div>
+
+<div id="controls">
+  <button id="up" class="ctrl">⬆️</button>
+  <button id="down" class="ctrl">⬇️</button>
+  <button id="left" class="ctrl">⬅️</button>
+  <button id="right" class="ctrl">➡️</button>
+  <button id="attack" class="ctrl">ATTACK</button>
+  <button id="fire" class="ctrl">FIRE</button>
+</div>
+
 <canvas id="gameCanvas"></canvas>
 
 <script>
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+let keys = {};
+let gameActive = false;
+let animationId;
+let armyInterval;
+
 let level = 1;
 let playerHP = 100;
-let boss = null;
 let startTime = 0;
 let currentTime = 0;
 let bestTime = localStorage.getItem("bestTime") || null;
 let lastClickTime = 0;
 
 let playerProfile = {
-  name:"",
+  name:"Player",
   money:0,
-  speed:4.0,
+  speed:4,
   char:"👦",
-  hasBazooka:false,
-  bearClicks:0
+  hasBazooka:false
 };
 
-let gameActive = false;
 let match = {
   px:0, py:0,
   bx:100, by:100,
   coins:[],
   missiles:[],
   enemies:[],
-  isArmyPhase:false,
+  spawnedCount:0,
   totalEnemiesToSpawn:20,
-  spawnedCount:0
+  isArmyPhase:false
 };
 
-let keys = {};
-let animationId;
-let armyInterval;
+let boss = null;
+let attackEffects = [];
 
 function confirmName(){
-  const nameInput = document.getElementById("username-input").value;
-  if(!nameInput) return;
+  const input = document.getElementById("username-input").value.trim();
+  playerProfile.name = input || "Player";
 
-  playerProfile.name = nameInput;
-
-  if(nameInput === "admin1114"){
+  if(playerProfile.name === "admin1114"){
     playerProfile.money = 9999;
-    playerProfile.speed = 10.0;
+    playerProfile.speed = 8;
     playerProfile.char = "🦸‍♂️";
   }
 
-  document.getElementById("name-box").style.display = "none";
-  document.getElementById("lobby-main").style.display = "block";
-  document.getElementById("player-name-display").innerText = playerProfile.name;
-  document.getElementById("lobby-char").innerText = playerProfile.char;
-  updateUI();
+  startMatch();
 }
 
 function updateUI(){
-  document.getElement
+  document.getElementById("lobby-money").innerText = playerProfile.money;
+  document.getElementById("lobby-speed").innerText = playerProfile.speed.toFixed(1);
+  document.getElementById("lobby-level").innerText = level;
+
+  document.getElementById("ingame-money").innerText = playerProfile.money;
+  document.getElementById("hp").innerText = Math.max(0, Math.floor(playerHP));
+  document.getElementById("time").innerText = currentTime;
+  document.getElementById("level").innerText = level;
+  document.getElementById("best").innerText = bestTime ? bestTime + "s" : "---";
+
+  const left = (match.totalEnemiesToSpawn - match.spawnedCount) + match.enemies.length + (boss ? 1 : 0);
+  document.getElementById("enemies-left").innerText = left;
+}
+
+function startMatch(){
+  gameActive = true;
+  clearInterval(armyInterval);
+  cancelAnimationFrame(animationId);
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  document.getElementById("lobby-screen").style.display = "none";
+  document.getElementById("game-ui").style.display = "flex";
+  document.getElementById("best-bar").style.display = "block";
+  document.getElementById("controls").style.display = "block";
+  canvas.style.display = "block";
+
+  playerHP = 100 + level * 10;
+  playerProfile.hasBazooka = false;
+
+  match.px = canvas.width / 2;
+  match.py = canvas.height / 2;
+  match.bx = 70;
+  match.by = 90;
+  match.coins = [];
+  match.missiles = [];
+  match.enemies = [];
+  match.spawnedCount = 0;
+  match.totalEnemiesToSpawn = 10 + level * 8;
+  match.isArmyPhase = false;
+
+  boss = null;
+  if(level % 3 === 0){
+    boss = {
+      x:canvas.width - 120,
+      y:120,
+      hp:8 + level * 4,
+      speed:1.1 + level * .15,
+      type:"👑🐻"
+    };
+  }
+
+  for(let i=0;i<10;i++) spawnCoin();
+
+  startTime = Date.now();
+  updateUI();
+  update();
+}
+
+function spawnCoin(){
+  match.coins.push({
+    x:Math.random() * (canvas.width - 60) + 30,
+    y:Math.random() * (canvas.height - 120) + 90
+  });
+}
+
+function spawnSingleEnemy(){
+  if(match.spawnedCount < match.totalEnemiesToSpawn){
+    match.enemies.push({
+      x:Math.random() > .5 ? -50 : canvas.width + 50,
+      y:Math.random() * canvas.height,
+      speed:2 + level * .25,
+      hp:1 + Math.floor(level / 3),
+      type:level < 3 ? "🐺" : level < 6 ? "🧟‍♂️" : level < 9 ? "👹" : "🐲"
+    });
+    match.spawnedCount++;
+  }
+}
+
+function backToLobby(msg){
+  gameActive = false;
+  clearInterval(armyInterval);
+  cancelAnimationFrame(animationId);
+
+  if(msg) alert(msg);
+
+  document.getElementById("lobby-screen").style.display = "flex";
+  document.getElementById("game-ui").style.display = "none";
+  document.getElementById("best-bar").style.display = "none";
+  document.getElementById("controls").style.display = "none";
+  canvas.style.display = "none";
+
+  updateUI();
+}
+
+function normalAttack(){
+  if(!gameActive) return;
+
+  attackEffects.push({x:match.px,y:match.py,t:12});
+
+  if(Math.hypot(match.px - match.bx, match.py - match.by) < 95){
+    match.bx = -5000;
+    startArmy();
+  }
+
+  for(let i=match.enemies.length-1;i>=0;i--){
+    const en = match.enemies[i];
+    if(Math.hypot(match.px - en.x, match.py - en.y) < 95){
+      en.hp--;
+      if(en.hp <= 0){
+        match.enemies.splice(i,1);
+        playerProfile.money += 25;
+      }
+    }
+  }
+
+  if(boss && Math.hypot(match.px - boss.x, match.py - boss.y) < 120){
+    boss.hp--;
+    if(boss.hp <= 0){
+      boss = null;
+      playerProfile.money += 400;
+    }
+  }
+}
+
+function startArmy(){
+  if(!match.isArmyPhase){
+    match.isArmyPhase = true;
+    armyInterval = setInterval(spawnSingleEnemy, Math.max(350, 1000 - level * 60));
+  }
+}
+
+function handleClick(x,y){
+  if(!gameActive) return;
+
+  const distToBear = Math.hypot(x - match.bx, y - match.by);
+
+  if(!playerProfile.hasBazooka && distToBear < 90){
+    const now = Date.now();
+
+    if(now - lastClickTime < 350){
+      playerProfile.hasBazooka = true;
+      alert("🔫 BAZOOKA UNLOCKED!");
+    }
+
+    lastClickTime = now;
+    return;
+  }
+
+  if(playerProfile.hasBazooka){
+    const a = Math.atan2(y - match.py, x - match.px);
+    match.missiles.push({
+      x:match.px,
+      y:match.py,
+      vx:Math.cos(a) * 12,
+      vy:Math.sin(a) * 12
+    });
+  }else{
+    normalAttack();
+  }
+}
+
+canvas.addEventListener("mousedown", e => handleClick(e.clientX,e.clientY));
+
+canvas.addEventListener("touchstart", e => {
+  e.preventDefault();
+  const t = e.touches[0];
+  handleClick(t.clientX,t.clientY);
+},{passive:false});
+
+window.addEventListener("keydown", e => {
+  keys[e.code] = true;
+  if(e.code === "Space") normalAttack();
+});
+
+window.addEventListener("keyup", e => keys[e.code] = false);
+
+function bind(id,code){
+  const b = document.getElementById(id);
+  b.addEventListener("touchstart", e => {e.preventDefault(); keys[code]=true;},{passive:false});
+  b.addEventListener("touchend", e => {e.preventDefault(); keys[code]=false;},{passive:false});
+  b.addEventListener("mousedown", () => keys[code]=true);
+  b.addEventListener("mouseup", () => keys[code]=false);
+}
+
+bind("up","ArrowUp");
+bind("down","ArrowDown");
+bind("left","ArrowLeft");
+bind("right","ArrowRight");
+
+document.getElementById("attack").onclick = normalAttack;
+document.getElementById("fire").onclick = () => handleClick(match.px + 200, match.py);
+
+function update(){
+  if(!gameActive) return;
+
+  currentTime = ((Date.now() - startTime) / 1000).toFixed(1);
+
+  if(keys["ArrowUp"] || keys["KeyW"]) match.py -= playerProfile.speed;
+  if(keys["ArrowDown"] || keys["KeyS"]) match.py += playerProfile.speed;
+  if(keys["ArrowLeft"] || keys["KeyA"]) match.px -= playerProfile.speed;
+  if(keys["ArrowRight"] || keys["KeyD"]) match.px += playerProfile.speed;
+
+  match.px = Math.max(30, Math.min(canvas.width - 30, match.px));
+  match.py = Math.max(90, Math.min(canvas.height - 30, match.py));
+
+  if(match.bx > -1000){
+    moveTo(match, "b", 2.2 + level * .15);
+    if(Math.hypot(match.px - match.bx, match.py - match.by) < 45){
+      playerHP -= .4;
+    }
+  }
+
+  match.enemies.forEach(en => {
+    const a = Math.atan2(match.py - en.y, match.px - en.x);
+    en.x += Math.cos(a) * en.speed;
+    en.y += Math.sin(a) * en.speed;
+
+    if(Math.hypot(match.px - en.x, match.py - en.y) < 42){
+      playerHP -= .25 + level * .03;
+    }
+  });
+
+  if(boss){
+    const ba = Math.atan2(match.py - boss.y, match.px - boss.x);
+    boss.x += Math.cos(ba) * boss.speed;
+    boss.y += Math.sin(ba) * boss.speed;
+
+    if(Math.hypot(match.px - boss.x, match.py - boss.y) < 60){
+      playerHP -= .55;
+    }
+  }
+
+  for(let mi=match.missiles.length-1;mi>=0;mi--){
+    const m = match.missiles[mi];
+    m.x += m.vx;
+    m.y += m.vy;
+
+    if(Math.hypot(m.x - match.bx, m.y - match.by) < 55){
+      match.bx = -5000;
+      match.missiles.splice(mi,1);
+      startArmy();
+      continue;
+    }
+
+    for(let ei=match.enemies.length-1;ei>=0;ei--){
+      const en = match.enemies[ei];
+      if(Math.hypot(m.x - en.x, m.y - en.y) < 45){
+        en.hp -= 3;
+        match.missiles.splice(mi,1);
+        if(en.hp <= 0){
+          match.enemies.splice(ei,1);
+          playerProfile.money += 30;
+        }
+        break;
+      }
+    }
+
+    if(boss && Math.hypot(m.x - boss.x, m.y - boss.y) < 65){
+      boss.hp -= 3;
+      match.missiles.splice(mi,1);
+      if(boss.hp <= 0){
+        boss = null;
+        playerProfile.money += 400;
+      }
+    }
+  }
+
+  match.coins.forEach((c,i)=>{
+    if(Math.hypot(match.px - c.x, match.py - c.y) < 35){
+      match.coins.splice(i,1);
+      playerProfile.money += 20;
+      spawnCoin();
+    }
+  });
+
+  attackEffects.forEach((e,i)=>{
+    e.t--;
+    if(e.t <= 0) attackEffects.splice(i,1);
+  });
+
+  if(playerHP <= 0){
+    backToLobby("Game Over! Try again!");
+    return;
+  }
+
+  if(match.isArmyPhase && match.spawnedCount >= match.totalEnemiesToSpawn && match.enemies.length === 0 && !boss){
+    const newRecord = !bestTime || Number(currentTime) < Number(bestTime);
+    if(newRecord){
+      bestTime = currentTime;
+      localStorage.setItem("bestTime", bestTime);
+    }
+
+    let stars = "⭐";
+    if(currentTime < 45) stars = "⭐⭐⭐";
+    else if(currentTime < 80) stars = "⭐⭐";
+
+    level++;
+    playerProfile.money += 200;
+    playerProfile.speed += .35;
+
+    if(level >= 2) playerProfile.char = "🦸‍♂️";
+    if(level >= 4) playerProfile.char = "🥷";
+    if(level >= 6) playerProfile.char = "🧙‍♂️";
+    if(level >= 9) playerProfile.char = "👑";
+
+    backToLobby((newRecord ? "🏆 NEW BEST! " : "") + "Victory! Time: " + currentTime + "s " + stars);
+    return;
+  }
+
+  updateUI();
+  draw();
+  animationId = requestAnimationFrame(update);
+}
+
+function moveTo(obj, prefix, speed){
+  const ox = obj[prefix + "x"];
+  const oy = obj[prefix + "y"];
+  const a = Math.atan2(match.py - oy, match.px - ox);
+  obj[prefix + "x"] += Math.cos(a) * speed;
+  obj[prefix + "y"] += Math.sin(a) * speed;
+}
+
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = match.isArmyPhase ? "#2c3e50" : "#67aa5d";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.textAlign = "center";
+
+  match.coins.forEach(c=>{
+    ctx.font = "30px Arial";
+    ctx.fillText("💰",c.x,c.y);
+  });
+
+  if(match.bx > -1000){
+    ctx.font = "58px Arial";
+    ctx.fillText("🐻",match.bx,match.by);
+  }
+
+  match.enemies.forEach(en=>{
+    ctx.font = "46px Arial";
+    ctx.fillText(en.type,en.x,en.y);
+  });
+
+  if(boss){
+    ctx.font = "64px Arial";
+    ctx.fillText(boss.type,boss.x,boss.y);
+    ctx.font = "22px Arial";
+    ctx.fillStyle = "white";
+    ctx.fillText("Boss HP: " + boss.hp,boss.x,boss.y - 55);
+  }
+
+  match.missiles.forEach(m=>{
+    ctx.font = "30px Arial";
+    ctx.fillText("🔥",m.x,m.y);
+  });
+
+  attackEffects.forEach(e=>{
+    ctx.font = "55px Arial";
+    ctx.fillText("💥",e.x,e.y);
+  });
+
+  ctx.font = "60px Arial";
+  ctx.fillText(playerProfile.char,match.px,match.py);
+
+  if(playerProfile.hasBazooka){
+    ctx.font = "36px Arial";
+    ctx.fillText("🔫",match.px + 40,match.py - 25);
+  }
+}
+
+window.addEventListener("resize",()=>{
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+updateUI();
+</script>
+</body>
+</html>
