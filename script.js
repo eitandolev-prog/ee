@@ -3,12 +3,32 @@ console.log("JS IS RUNNING");
 let level = 1;
 let lastClickTime = 0;
 
+let startTime = 0;
+let currentTime = 0;
+let bestTime = localStorage.getItem("bestTime") || null;
+
+function startTimer() {
+    startTime = Date.now();
+}
+
+function updateTimer() {
+    currentTime = ((Date.now() - startTime) / 1000).toFixed(1);
+}
+
+function saveBestTime() {
+    if (!bestTime || Number(currentTime) < Number(bestTime)) {
+        bestTime = currentTime;
+        localStorage.setItem("bestTime", bestTime);
+        return true;
+    }
+    return false;
+}
+
 function handleClick(x, y) {
     if (!gameActive) return;
 
     const distToBear = Math.hypot(x - match.bx, y - match.by);
 
-    // Double click/tap on bear unlocks bazooka
     if (!playerProfile.hasBazooka && distToBear < 80) {
         const now = Date.now();
 
@@ -21,7 +41,6 @@ function handleClick(x, y) {
         return;
     }
 
-    // Shoot bazooka
     if (playerProfile.hasBazooka) {
         let angle = Math.atan2(y - match.py, x - match.px);
         match.missiles.push({
@@ -33,12 +52,10 @@ function handleClick(x, y) {
     }
 }
 
-// Computer
 canvas.addEventListener("mousedown", (e) => {
     handleClick(e.clientX, e.clientY);
 });
 
-// Phone
 canvas.addEventListener("touchstart", (e) => {
     e.preventDefault();
     const touch = e.touches[0];
