@@ -1,4 +1,11 @@
 console.log("JS IS RUNNING");
+let bonus = Math.max(50, 300 - Math.floor(currentTime * 2));
+playerProfile.money += bonus;
+let stars = "⭐";
+if(currentTime < 60) stars = "⭐⭐⭐";
+else if(currentTime < 100) stars = "⭐⭐";
+
+backToLobby("Victory! Time: " + currentTime + "s " + stars);
 let level = 1;
 function handleClick(x, y) {
     if (!gameActive) return;
