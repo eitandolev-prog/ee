@@ -4,20 +4,48 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Super Bear Island</title>
+
 <style>
-body{margin:0;overflow:hidden;font-family:Arial;background:#222;color:white;text-align:center}
-#lobby{position:fixed;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#111}
-button{padding:20px;font-size:25px;border:none;border-radius:10px;background:#27ae60;color:white;cursor:pointer}
-input{padding:14px;font-size:20px;border-radius:10px;border:none;text-align:center;margin:10px}
-canvas{display:none;background:#67aa5d}
+body{
+  margin:0;
+  overflow:hidden;
+  font-family:Arial;
+  background:#222;
+  color:white;
+  text-align:center;
+}
+
+#lobby{
+  position:fixed;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  background:#111;
+}
+
+button{
+  padding:20px;
+  font-size:25px;
+  border:none;
+  border-radius:10px;
+  background:#27ae60;
+  color:white;
+  cursor:pointer;
+}
+
+canvas{
+  display:none;
+  background:#27ae60;
+}
 </style>
 </head>
+
 <body>
 
 <div id="lobby">
   <h1>SUPER BEAR ISLAND</h1>
-  <input id="nameInput" placeholder="Enter player name">
-  <h2 id="playerNameText"></h2>
   <button onclick="startGame()">START</button>
 </div>
 
@@ -28,36 +56,9 @@ const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
 let gameActive = false;
-let keys = {};
-
-let player = {
-  name: localStorage.getItem("playerName") || "",
-  x: 300,
-  y: 300,
-  speed: 5,
-  emoji: "👦"
-};
-
-let wolves = [];
-let bears = [];
-
-if(player.name){
-  document.getElementById("nameInput").style.display = "none";
-  document.getElementById("playerNameText").innerText = "Player: " + player.name;
-}
 
 function startGame(){
-  const input = document.getElementById("nameInput");
-
-  if(!player.name){
-    player.name = input.value.trim() || "Player";
-    localStorage.setItem("playerName", player.name);
-  }
-
-  if(player.name === "Eitan1114"){
-    player.speed = 10;
-    player.emoji = "🦸‍♂️";
-  }
+  gameActive = true;
 
   document.getElementById("lobby").style.display = "none";
   canvas.style.display = "block";
@@ -65,87 +66,14 @@ function startGame(){
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  player.x = canvas.width / 2;
-  player.y = canvas.height / 2;
-
-  wolves = [];
-  bears = [];
-
-  for(let i = 0; i < 6; i++){
-    wolves.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      speed: 2.2
-    });
-  }
-
-  for(let i = 0; i < 2; i++){
-    bears.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      speed: 1.6
-    });
-  }
-
-  gameActive = true;
-  gameLoop();
+  draw();
 }
 
-function backToLobby(message){
-  gameActive = false;
-  if(message) alert(message);
-
-  canvas.style.display = "none";
-  document.getElementById("lobby").style.display = "flex";
-
-  document.getElementById("nameInput").style.display = "none";
-  document.getElementById("playerNameText").innerText = "Player: " + player.name;
-}
-
-window.addEventListener("keydown", e => keys[e.code] = true);
-window.addEventListener("keyup", e => keys[e.code] = false);
-
-function moveEnemy(enemy, speed){
-  let angle = Math.atan2(player.y - enemy.y, player.x - enemy.x);
-  enemy.x += Math.cos(angle) * speed;
-  enemy.y += Math.sin(angle) * speed;
-}
-
-function gameLoop(){
+function draw(){
   if(!gameActive) return;
 
-  if(keys["ArrowUp"] || keys["KeyW"]) player.y -= player.speed;
-  if(keys["ArrowDown"] || keys["KeyS"]) player.y += player.speed;
-  if(keys["ArrowLeft"] || keys["KeyA"]) player.x -= player.speed;
-  if(keys["ArrowRight"] || keys["KeyD"]) player.x += player.speed;
-
   ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  ctx.font = "55px Arial";
-  ctx.textAlign = "center";
-  ctx.fillText(player.emoji, player.x, player.y);
-
-  wolves.forEach(wolf => {
-    moveEnemy(wolf, wolf.speed);
-    ctx.font = "45px Arial";
-    ctx.fillText("🐺", wolf.x, wolf.y);
-
-    if(Math.hypot(player.x - wolf.x, player.y - wolf.y) < 45){
-      backToLobby("Game Over! A wolf caught you!");
-    }
-  });
-
-  bears.forEach(bear => {
-    moveEnemy(bear, bear.speed);
-    ctx.font = "55px Arial";
-    ctx.fillText("🐻", bear.x, bear.y);
-
-    if(Math.hypot(player.x - bear.x, player.y - bear.y) < 55){
-      backToLobby("Game Over! A bear caught you!");
-    }
-  });
-
-  requestAnimationFrame(gameLoop);
+  requestAnimationFrame(draw);
 }
 </script>
 
