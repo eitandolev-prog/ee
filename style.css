@@ -1,0 +1,15 @@
+#game-ui {
+  pointer-events: none;
+}
+
+#controls {
+  pointer-events: none;
+}
+
+#controls button {
+  pointer-events: auto;
+}
+
+canvas {
+  pointer-events: auto;
+}
